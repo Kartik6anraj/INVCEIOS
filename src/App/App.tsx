@@ -1,32 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import {
   IonApp,
   IonHeader,
   IonContent,
   IonToolbar,
   IonTitle,
-  IonButtons,
-  IonBackButton,
   IonIcon,
   IonButton,
-  IonActionSheet,
   IonFab,
   IonFabButton,
   IonPopover,
+  useIonViewWillEnter,
 } from "@ionic/react";
-import {
-  person,
-  settings,
-  saveOutline,
-  mail,
-  print,
-  save,
-  fileTrayFull,
-  add,
-  menu,
-} from "ionicons/icons";
+import { person, settings, fileTrayFull, add, menu } from "ionicons/icons";
+
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { DATA } from "../app-data.js";
+
+import Menu from "../Menu/Menu";
 
 import "./App.css";
 
@@ -45,16 +36,62 @@ import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css";
+import Files from "../Files/Files";
 
 /* Theme variables */
 // import "../theme/variables.css";
 
 const App: React.FC = () => {
-  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [showPopover, setShowPopover] = useState<{
     open: boolean;
     event: Event | undefined;
   }>({ open: false, event: undefined });
+  const [selectedFile, updateSelectedFile] = useState("default");
+  const [device] = useState(AppGeneral.getDeviceType());
+  const [listFiles, setListFiles] = useState(false);
+
+  const usePrevious = <T extends {}>(value: T): T | undefined => {
+    const ref = useRef<T>();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  };
+
+  const prevListFiles = usePrevious(listFiles);
+  const toggleListFiles = () => {
+    console.log("list Files toggled");
+    setListFiles(!prevListFiles);
+  };
+
+  const closeMenu = () => {
+    setShowMenu(false);
+  };
+
+  const activateFooter = (footer) => {
+    AppGeneral.activateFooterButton(footer);
+  };
+
+  useEffect(() => {
+    const data = DATA["home"][device]["msc"];
+    AppGeneral.initializeApp(JSON.stringify(data));
+  }, []);
+
+  const footers = DATA["home"][device]["footers"];
+  const footersList = footers.map((footerArray, i) => {
+    return (
+      <IonButton
+        key={footerArray.index}
+        expand='full'
+        color='light'
+        className='ion-no-margin'
+        onClick={() => activateFooter(footerArray.index)}
+      >
+        {footerArray.name}
+      </IonButton>
+    );
+  });
 
   return (
     <IonApp>
@@ -66,7 +103,9 @@ const App: React.FC = () => {
             className='ion-padding-start'
             size='large'
           />
-          <IonTitle className='ion-text-left'>Editing : Default</IonTitle>
+          <IonTitle className='ion-text-left'>
+            Editing : {selectedFile}
+          </IonTitle>
           <IonIcon
             icon={settings}
             slot='end'
@@ -82,9 +121,7 @@ const App: React.FC = () => {
             className='ion-padding-end'
             slot='end'
             size='large'
-            onClick={() => {
-              console.log("List files Clicked");
-            }}
+            onClick={toggleListFiles}
           />
           <IonIcon
             icon={add}
@@ -96,42 +133,6 @@ const App: React.FC = () => {
             }}
           />
 
-          <IonActionSheet
-            animated
-            keyboardClose
-            isOpen={showActionSheet}
-            onDidDismiss={() => setShowActionSheet(false)}
-            buttons={[
-              {
-                text: "Save",
-                icon: saveOutline,
-                handler: () => {
-                  console.log("Save clicked");
-                },
-              },
-              {
-                text: "Save As",
-                icon: save,
-                handler: () => {
-                  console.log("Save As clicked");
-                },
-              },
-              {
-                text: "Print",
-                icon: print,
-                handler: () => {
-                  console.log("Print clicked");
-                },
-              },
-              {
-                text: "Email",
-                icon: mail,
-                handler: () => {
-                  console.log("Email clicked");
-                },
-              },
-            ]}
-          ></IonActionSheet>
           <IonPopover
             animated
             keyboardClose
@@ -142,34 +143,33 @@ const App: React.FC = () => {
               setShowPopover({ open: false, event: undefined })
             }
           >
-            <IonButton expand='full' color='light' className='ion-no-margin'>
-              Invoice 1
-            </IonButton>
-            <IonButton expand='full' color='light' className='ion-no-margin'>
-              Invoice 2
-            </IonButton>
-            <IonButton expand='full' color='light' className='ion-no-margin'>
-              Company Invoice 1
-            </IonButton>
-            <IonButton expand='full' color='light' className='ion-no-margin'>
-              Company Invoice 2
-            </IonButton>
+            {footersList}
           </IonPopover>
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        Hello
         <IonFab vertical='bottom' horizontal='end' slot='fixed'>
-          <IonFabButton
-            type='button'
-            onClick={() => {
-              setShowActionSheet(true);
-              console.log("Menu clicked");
-            }}
-          >
+          <IonFabButton type='button' onClick={() => setShowMenu(true)}>
             <IonIcon icon={menu} />
           </IonFabButton>
         </IonFab>
+        <Menu
+          showM={showMenu}
+          setM={closeMenu}
+          file={selectedFile}
+          updateSelectedFile={updateSelectedFile}
+        />
+        <div id='workbookControl'></div>
+        <div id='tableeditor'>editor goes here</div>
+        <div id='msg'></div>
+        {listFiles ? (
+          <div className='App-files'>
+            <Files
+              file={selectedFile}
+              updateSelectedFile={updateSelectedFile}
+            />
+          </div>
+        ) : null}
       </IonContent>
     </IonApp>
   );
