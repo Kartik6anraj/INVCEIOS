@@ -12,6 +12,7 @@ import {
   IonActionSheet,
   IonFab,
   IonFabButton,
+  IonPopover,
 } from "@ionic/react";
 import {
   person,
@@ -21,7 +22,7 @@ import {
   print,
   save,
   fileTrayFull,
-  document,
+  add,
   menu,
 } from "ionicons/icons";
 import * as AppGeneral from "../socialcalc/AppGeneral";
@@ -50,9 +51,10 @@ import "@ionic/react/css/display.css";
 
 const App: React.FC = () => {
   const [showActionSheet, setShowActionSheet] = useState(false);
-  const [showActionSheetInvoiceType, setShowActionSheetInvoicetype] = useState(
-    false
-  );
+  const [showPopover, setShowPopover] = useState<{
+    open: boolean;
+    event: Event | undefined;
+  }>({ open: false, event: undefined });
 
   return (
     <IonApp>
@@ -64,14 +66,36 @@ const App: React.FC = () => {
             className='ion-padding-start'
             size='large'
           />
-          <IonTitle className='ion-text-center'>Editing : Default</IonTitle>
+          <IonTitle className='ion-text-left'>Editing : Default</IonTitle>
           <IonIcon
-            icon={menu}
+            icon={settings}
             slot='end'
             className='ion-padding-end'
             size='large'
-            onClick={() => setShowActionSheet(true)}
+            onClick={(e) => {
+              setShowPopover({ open: true, event: e.nativeEvent });
+              console.log("Popover clicked");
+            }}
           />
+          <IonIcon
+            icon={fileTrayFull}
+            className='ion-padding-end'
+            slot='end'
+            size='large'
+            onClick={() => {
+              console.log("List files Clicked");
+            }}
+          />
+          <IonIcon
+            icon={add}
+            slot='end'
+            className='ion-padding-end'
+            size='large'
+            onClick={() => {
+              console.log("New file clicked");
+            }}
+          />
+
           <IonActionSheet
             animated
             keyboardClose
@@ -93,21 +117,6 @@ const App: React.FC = () => {
                 },
               },
               {
-                text: "List Files",
-                icon: fileTrayFull,
-                handler: () => {
-                  console.log("List Files clicked");
-                },
-              },
-              {
-                text: "Change Invoice Type",
-                icon: settings,
-                handler: () => {
-                  setShowActionSheetInvoicetype(true);
-                  console.log("Change Invoice Type clicked");
-                },
-              },
-              {
                 text: "Print",
                 icon: print,
                 handler: () => {
@@ -123,38 +132,29 @@ const App: React.FC = () => {
               },
             ]}
           ></IonActionSheet>
-          <IonActionSheet
+          <IonPopover
             animated
             keyboardClose
-            isOpen={showActionSheetInvoiceType}
-            onDidDismiss={() => setShowActionSheetInvoicetype(false)}
-            buttons={[
-              {
-                text: "Invoice 1",
-                handler: () => {
-                  console.log("Invoice 1 clicked");
-                },
-              },
-              {
-                text: "Invoice 2",
-                handler: () => {
-                  console.log("Invoice 2 clicked");
-                },
-              },
-              {
-                text: "Company Invoice 1",
-                handler: () => {
-                  console.log("Company Invoice 1 clicked");
-                },
-              },
-              {
-                text: "Company Invoice 2",
-                handler: () => {
-                  console.log("Company Invoice 2 clicked");
-                },
-              },
-            ]}
-          ></IonActionSheet>
+            backdropDismiss
+            event={showPopover.event}
+            isOpen={showPopover.open}
+            onDidDismiss={(e) =>
+              setShowPopover({ open: false, event: undefined })
+            }
+          >
+            <IonButton expand='full' color='light' className='ion-no-margin'>
+              Invoice 1
+            </IonButton>
+            <IonButton expand='full' color='light' className='ion-no-margin'>
+              Invoice 2
+            </IonButton>
+            <IonButton expand='full' color='light' className='ion-no-margin'>
+              Company Invoice 1
+            </IonButton>
+            <IonButton expand='full' color='light' className='ion-no-margin'>
+              Company Invoice 2
+            </IonButton>
+          </IonPopover>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -163,10 +163,11 @@ const App: React.FC = () => {
           <IonFabButton
             type='button'
             onClick={() => {
-              console.log("New file clicked");
+              setShowActionSheet(true);
+              console.log("Menu clicked");
             }}
           >
-            <IonIcon icon={document} />
+            <IonIcon icon={menu} />
           </IonFabButton>
         </IonFab>
       </IonContent>
