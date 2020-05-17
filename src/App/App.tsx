@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   IonApp,
   IonHeader,
@@ -10,9 +10,8 @@ import {
   IonFab,
   IonFabButton,
   IonPopover,
-  useIonViewWillEnter,
 } from "@ionic/react";
-import { person, settings, fileTrayFull, add, menu } from "ionicons/icons";
+import { settings, fileTrayFull, menu } from "ionicons/icons";
 
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { DATA } from "../app-data.js";
@@ -37,6 +36,9 @@ import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css";
 import Files from "../Files/Files";
+import NewFile from "../NewFile/NewFile";
+import { Local } from "../storage/LocalStorage";
+import Login from "../Login/Login";
 
 /* Theme variables */
 // import "../theme/variables.css";
@@ -51,18 +53,11 @@ const App: React.FC = () => {
   const [device] = useState(AppGeneral.getDeviceType());
   const [listFiles, setListFiles] = useState(false);
 
-  const usePrevious = <T extends {}>(value: T): T | undefined => {
-    const ref = useRef<T>();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  };
+  const store = new Local();
 
-  const prevListFiles = usePrevious(listFiles);
   const toggleListFiles = () => {
     console.log("list Files toggled");
-    setListFiles(!prevListFiles);
+    setListFiles((prevListFiles) => !prevListFiles);
   };
 
   const closeMenu = () => {
@@ -79,7 +74,7 @@ const App: React.FC = () => {
   }, []);
 
   const footers = DATA["home"][device]["footers"];
-  const footersList = footers.map((footerArray, i) => {
+  const footersList = footers.map((footerArray) => {
     return (
       <IonButton
         key={footerArray.index}
@@ -97,15 +92,15 @@ const App: React.FC = () => {
     <IonApp>
       <IonHeader>
         <IonToolbar color='primary'>
-          <IonIcon
-            icon={person}
-            slot='start'
-            className='ion-padding-start'
-            size='large'
-          />
-          <IonTitle className='ion-text-left'>
-            Editing : {selectedFile}
-          </IonTitle>
+          <Login />
+          {listFiles ? (
+            <div className='App-files'>
+              <Files
+                file={selectedFile}
+                updateSelectedFile={updateSelectedFile}
+              />
+            </div>
+          ) : null}
           <IonIcon
             icon={settings}
             slot='end'
@@ -116,6 +111,7 @@ const App: React.FC = () => {
               console.log("Popover clicked");
             }}
           />
+
           <IonIcon
             icon={fileTrayFull}
             className='ion-padding-end'
@@ -123,14 +119,11 @@ const App: React.FC = () => {
             size='large'
             onClick={toggleListFiles}
           />
-          <IonIcon
-            icon={add}
-            slot='end'
-            className='ion-padding-end'
-            size='large'
-            onClick={() => {
-              console.log("New file clicked");
-            }}
+
+          <NewFile
+            file={selectedFile}
+            updateSelectedFile={updateSelectedFile}
+            store={store}
           />
 
           <IonPopover
@@ -139,7 +132,7 @@ const App: React.FC = () => {
             backdropDismiss
             event={showPopover.event}
             isOpen={showPopover.open}
-            onDidDismiss={(e) =>
+            onDidDismiss={() =>
               setShowPopover({ open: false, event: undefined })
             }
           >
@@ -147,6 +140,11 @@ const App: React.FC = () => {
           </IonPopover>
         </IonToolbar>
       </IonHeader>
+      <IonToolbar color='secondary'>
+        <IonTitle className='ion-text-center'>
+          Editing : {selectedFile}
+        </IonTitle>
+      </IonToolbar>
       <IonContent>
         <IonFab vertical='bottom' horizontal='end' slot='fixed'>
           <IonFabButton type='button' onClick={() => setShowMenu(true)}>
@@ -158,6 +156,7 @@ const App: React.FC = () => {
           setM={closeMenu}
           file={selectedFile}
           updateSelectedFile={updateSelectedFile}
+          store={store}
         />
         <div id='workbookControl'></div>
         <div id='tableeditor'>editor goes here</div>
