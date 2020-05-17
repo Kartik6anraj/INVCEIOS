@@ -51,14 +51,8 @@ const App: React.FC = () => {
   }>({ open: false, event: undefined });
   const [selectedFile, updateSelectedFile] = useState("default");
   const [device] = useState(AppGeneral.getDeviceType());
-  const [listFiles, setListFiles] = useState(false);
 
   const store = new Local();
-
-  const toggleListFiles = () => {
-    console.log("list Files toggled");
-    setListFiles((prevListFiles) => !prevListFiles);
-  };
 
   const closeMenu = () => {
     setShowMenu(false);
@@ -93,14 +87,6 @@ const App: React.FC = () => {
       <IonHeader>
         <IonToolbar color='primary'>
           <Login />
-          {listFiles ? (
-            <div className='App-files'>
-              <Files
-                file={selectedFile}
-                updateSelectedFile={updateSelectedFile}
-              />
-            </div>
-          ) : null}
           <IonIcon
             icon={settings}
             slot='end'
@@ -112,12 +98,10 @@ const App: React.FC = () => {
             }}
           />
 
-          <IonIcon
-            icon={fileTrayFull}
-            className='ion-padding-end'
-            slot='end'
-            size='large'
-            onClick={toggleListFiles}
+          <Files
+            store={store}
+            file={selectedFile}
+            updateSelectedFile={updateSelectedFile}
           />
 
           <NewFile
@@ -161,14 +145,6 @@ const App: React.FC = () => {
         <div id='workbookControl'></div>
         <div id='tableeditor'>editor goes here</div>
         <div id='msg'></div>
-        {listFiles ? (
-          <div className='App-files'>
-            <Files
-              file={selectedFile}
-              updateSelectedFile={updateSelectedFile}
-            />
-          </div>
-        ) : null}
       </IonContent>
     </IonApp>
   );

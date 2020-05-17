@@ -13,7 +13,7 @@ const NewFile: React.FC<{
   const newFile = () => {
     if (props.file !== "default") {
       const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
-      const data = this.store._getFile(props.file);
+      const data = props.store._getFile(props.file);
       const file = new File(
         data.created,
         new Date().toString(),

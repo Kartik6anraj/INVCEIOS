@@ -21,18 +21,9 @@ const Login: React.FC = () => {
 
   const doAuth = () => {
     console.log("Loggin in... " + email);
+    setlLogin(true);
     const data = { email: email, password: password, appname: APP_NAME };
     cloud._auth(data);
-  };
-
-  const auth = (loggedIn) => {
-    if (loggedIn) {
-      console.log("log out..");
-      setlLogin(false);
-    } else {
-      console.log("log in..");
-      setlLogin(true);
-    }
   };
 
   const loginForm = () => {
@@ -85,8 +76,9 @@ const Login: React.FC = () => {
         slot='start'
         className='ion-padding-start'
         onClick={() => {
-          auth(login);
+          // auth(login);
           if (!login) setOpenLoginModal(true);
+          else setlLogin(false);
         }}
       >
         <IonIcon icon={person} size='large' />
