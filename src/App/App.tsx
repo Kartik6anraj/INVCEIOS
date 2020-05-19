@@ -11,7 +11,7 @@ import {
   IonFabButton,
   IonPopover,
 } from "@ionic/react";
-import { settings, fileTrayFull, menu } from "ionicons/icons";
+import { settings, menu } from "ionicons/icons";
 
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { DATA } from "../app-data.js";
@@ -75,7 +75,10 @@ const App: React.FC = () => {
         expand='full'
         color='light'
         className='ion-no-margin'
-        onClick={() => activateFooter(footerArray.index)}
+        onClick={() => {
+          activateFooter(footerArray.index);
+          setShowPopover({ open: false, event: undefined });
+        }}
       >
         {footerArray.name}
       </IonButton>
@@ -133,53 +136,53 @@ const App: React.FC = () => {
       </IonToolbar>
       */}
       <IonContent>
-      <IonHeader>
-        <IonToolbar color='primary'>
-          <Login />
-          <IonIcon
-            icon={settings}
-            slot='end'
-            className='ion-padding-end'
-            size='large'
-            onClick={(e) => {
-              setShowPopover({ open: true, event: e.nativeEvent });
-              console.log("Popover clicked");
-            }}
-          />
+        <IonHeader>
+          <IonToolbar color='primary'>
+            <Login />
+            <IonIcon
+              icon={settings}
+              slot='end'
+              className='ion-padding-end'
+              size='large'
+              onClick={(e) => {
+                setShowPopover({ open: true, event: e.nativeEvent });
+                console.log("Popover clicked");
+              }}
+            />
 
-          <Files
-            store={store}
-            file={selectedFile}
-            updateSelectedFile={updateSelectedFile}
-          />
+            <Files
+              store={store}
+              file={selectedFile}
+              updateSelectedFile={updateSelectedFile}
+            />
 
-          <NewFile
-            file={selectedFile}
-            updateSelectedFile={updateSelectedFile}
-            store={store}
-          />
+            <NewFile
+              file={selectedFile}
+              updateSelectedFile={updateSelectedFile}
+              store={store}
+            />
 
-          <IonPopover
-            animated
-            keyboardClose
-            backdropDismiss
-            event={showPopover.event}
-            isOpen={showPopover.open}
-            onDidDismiss={() =>
-              setShowPopover({ open: false, event: undefined })
-            }
-          >
-            {footersList}
-          </IonPopover>
+            <IonPopover
+              animated
+              keyboardClose
+              backdropDismiss
+              event={showPopover.event}
+              isOpen={showPopover.open}
+              onDidDismiss={() =>
+                setShowPopover({ open: false, event: undefined })
+              }
+            >
+              {footersList}
+            </IonPopover>
+          </IonToolbar>
+        </IonHeader>
+
+        <IonToolbar color='secondary'>
+          <IonTitle className='ion-text-center'>
+            Editing : {selectedFile}
+          </IonTitle>
         </IonToolbar>
-      </IonHeader>
-      
-      <IonToolbar color='secondary'>
-        <IonTitle className='ion-text-center'>
-          Editing : {selectedFile}
-        </IonTitle>
-      </IonToolbar>
-      
+
         <IonFab vertical='bottom' horizontal='end' slot='fixed'>
           <IonFabButton type='button' onClick={() => setShowMenu(true)}>
             <IonIcon icon={menu} />

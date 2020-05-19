@@ -3,13 +3,13 @@ import "./Files.css";
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { DATA } from "../app-data.js";
 import { Local } from "../storage/LocalStorage.js";
-import { render } from "react-dom";
 import {
   IonIcon,
   IonModal,
   IonItem,
-  IonButtons,
   IonButton,
+  IonList,
+  IonLabel,
 } from "@ionic/react";
 import { fileTrayFull, key } from "ionicons/icons";
 
@@ -18,43 +18,8 @@ const Files: React.FC<{
   file: string;
   updateSelectedFile: Function;
 }> = (props) => {
-  const store = props.store;
-  const [files, setFiles] = useState(store._getAllFiles());
+  const [files, setFiles] = useState(props.store._getAllFiles());
   const [listFiles, setListFiles] = useState(false);
-
-  let fileList;
-
-  const toggleListFiles = () => {
-    console.log("list Files toggled");
-    setListFiles((prevListFiles) => !prevListFiles);
-    console.log("show list files called" + listFiles);
-    const files = store._getAllFiles();
-    // console.log(JSON.stringify(files));
-    fileList = Object.keys(files).map((index) => {
-      // console.log(key);
-      return (
-        <IonItem key={index}>
-          <span>{_formatDate(files[index])}</span>
-          <IonButton
-            color='warning'
-            onClick={() => {
-              editFile(index);
-            }}
-          >
-            Edit
-          </IonButton>
-          <IonButton
-            color='danger'
-            onClick={() => {
-              deleteFile(index);
-            }}
-          >
-            Delete
-          </IonButton>
-        </IonItem>
-      );
-    });
-  };
 
   const editFile = (key) => {
     const data = props.store._getFile(key);
@@ -69,7 +34,7 @@ const Files: React.FC<{
     if (result) {
       // Delete file
       props.store._deleteFile(key);
-      setFiles(store._getAllFiles());
+      setFiles(props.store._getAllFiles());
       loadDefault();
     }
   };
@@ -84,7 +49,46 @@ const Files: React.FC<{
     return new Date(date).toLocaleString();
   };
 
-  const showListFiles = () => {};
+  const listModal = () => {
+    const files = props.store._getAllFiles();
+    // console.log(JSON.stringify(files));
+    const fileList = Object.keys(files).map((key) => {
+      // console.log(key);
+      return (
+        <IonItem key={key}>
+          <IonLabel>{key}</IonLabel>
+          <span>{" " + _formatDate(files[key])}</span>
+          <IonButton
+            slot='end'
+            color='warning'
+            onClick={() => {
+              setListFiles(false);
+              editFile(key);
+            }}
+          >
+            Edit
+          </IonButton>
+          <IonButton
+            slot='end'
+            color='danger'
+            onClick={() => {
+              setListFiles(false);
+              deleteFile(key);
+            }}
+          >
+            Delete
+          </IonButton>
+        </IonItem>
+      );
+    });
+    if (setListFiles) {
+      return (
+        <IonModal isOpen={listFiles} onDidDismiss={() => setListFiles(false)}>
+          <IonList> {fileList} </IonList>
+        </IonModal>
+      );
+    } else return null;
+  };
 
   return (
     <React.Fragment>
@@ -93,11 +97,11 @@ const Files: React.FC<{
         className='ion-padding-end'
         slot='end'
         size='large'
-        onClick={toggleListFiles}
+        onClick={() => {
+          setListFiles(true);
+        }}
       />
-      <IonModal isOpen={listFiles} onDidDismiss={() => setListFiles(false)}>
-        {fileList}
-      </IonModal>
+      {listModal()}
     </React.Fragment>
   );
 };
