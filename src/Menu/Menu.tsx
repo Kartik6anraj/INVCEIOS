@@ -4,7 +4,7 @@ import { DATA } from "../app-data.js";
 import { File, Local } from "../storage/LocalStorage.js";
 import AWS from "aws-sdk";
 
-import { IonActionSheet } from "@ionic/react";
+import { IonActionSheet, IonAlert, IonicSafeString } from "@ionic/react";
 import { saveOutline, save, mail, print } from "ionicons/icons";
 
 const ses = new AWS.SES({
@@ -20,8 +20,14 @@ const Menu: React.FC<{
   file: string;
   updateSelectedFile: Function;
   store: Local;
-  bT : number;
+  bT: number;
 }> = (props) => {
+  const [showAlert1, setShowAlert1] = useState(false);
+  const [showAlert2, setShowAlert2] = useState(false);
+  const [showAlert3, setShowAlert3] = useState(false);
+  const [showAlert4, setShowAlert4] = useState(false);
+  const [showAlert5, setShowAlert5] = useState(false);
+
   /* Utility functions */
   const _validateName = (filename) => {
     filename = filename.trim();
@@ -41,6 +47,10 @@ const Menu: React.FC<{
     return true;
   };
 
+  const getCurrentFileName = () => {
+    return props.file;
+  };
+
   const _formatString = (filename) => {
     /* Remove whitespaces */
     while (filename.indexOf(" ") !== -1) {
@@ -58,7 +68,7 @@ const Menu: React.FC<{
 
   const doSave = () => {
     if (props.file === "default") {
-      window.alert(`Cannot update ${props.file} file! `);
+      setShowAlert1(true);
       return;
     }
     const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
@@ -72,12 +82,11 @@ const Menu: React.FC<{
     );
     props.store._saveFile(file);
     props.updateSelectedFile(props.file);
-    window.alert(`File ${props.file} updated successfully! `);
+    setShowAlert2(true);
   };
 
-  const doSaveAs = () => {
+  const doSaveAs = (filename) => {
     // event.preventDefault();
-    const filename = window.prompt("Enter filename : ");
     if (filename) {
       if (_validateName(filename)) {
         // filename valid . go on save
@@ -94,9 +103,9 @@ const Menu: React.FC<{
         // console.log(JSON.stringify(data));
         props.store._saveFile(file);
         props.updateSelectedFile(filename);
-        window.alert(`File ${filename} saved successfully! `);
+        setShowAlert4(true);
       } else {
-        window.alert(`Filename cannot be ${props.file}`);
+        setShowAlert5(true);
       }
     }
   };
@@ -128,46 +137,110 @@ const Menu: React.FC<{
   };
 
   return (
-    <IonActionSheet
-      animated
-      keyboardClose
-      isOpen={props.showM}
-      onDidDismiss={() => props.setM()}
-      buttons={[
-        {
-          text: "Save",
-          icon: saveOutline,
-          handler: () => {
-            doSave();
-            console.log("Save clicked");
+    <React.Fragment>
+      <IonActionSheet
+        animated
+        keyboardClose
+        isOpen={props.showM}
+        onDidDismiss={() => props.setM()}
+        buttons={[
+          {
+            text: "Save",
+            icon: saveOutline,
+            handler: () => {
+              doSave();
+              console.log("Save clicked");
+            },
           },
-        },
-        {
-          text: "Save As",
-          icon: save,
-          handler: () => {
-            doSaveAs();
-            console.log("Save As clicked");
+          {
+            text: "Save As",
+            icon: save,
+            handler: () => {
+              setShowAlert3(true);
+              console.log("Save As clicked");
+            },
           },
-        },
-        {
-          text: "Print",
-          icon: print,
-          handler: () => {
-            doPrint();
-            console.log("Print clicked");
+          {
+            text: "Print",
+            icon: print,
+            handler: () => {
+              doPrint();
+              console.log("Print clicked");
+            },
           },
-        },
-        {
-          text: "Email",
-          icon: mail,
-          handler: () => {
-            sendEmail();
-            console.log("Email clicked");
+          {
+            text: "Email",
+            icon: mail,
+            handler: () => {
+              sendEmail();
+              console.log("Email clicked");
+            },
           },
-        },
-      ]}
-    ></IonActionSheet>
+        ]}
+      />
+      <IonAlert
+        animated
+        isOpen={showAlert1}
+        onDidDismiss={() => setShowAlert1(false)}
+        header='Alert Message'
+        message={
+          "Cannot update <strong>" + getCurrentFileName() + "</strong> file!"
+        }
+        buttons={["Ok"]}
+      />
+      <IonAlert
+        animated
+        isOpen={showAlert2}
+        onDidDismiss={() => setShowAlert2(false)}
+        header='Save'
+        message={
+          "File <strong>" +
+          getCurrentFileName() +
+          "</strong> updated successfully"
+        }
+        buttons={["Ok"]}
+      />
+      <IonAlert
+        animated
+        isOpen={showAlert3}
+        onDidDismiss={() => setShowAlert3(false)}
+        header='Save As'
+        inputs={[
+          { name: "filename", type: "text", placeholder: "Enter filename" },
+        ]}
+        buttons={[
+          {
+            text: "Ok",
+            handler: (alertData) => {
+              doSaveAs(alertData.filename);
+            },
+          },
+        ]}
+      />
+      <IonAlert
+        animated
+        isOpen={showAlert4}
+        onDidDismiss={() => setShowAlert4(false)}
+        header='Save As'
+        message={
+          "File <strong>" +
+          getCurrentFileName() +
+          "</strong> saved successfully"
+        }
+        buttons={["Ok"]}
+      />
+      <IonAlert
+        animated
+        isOpen={showAlert5}
+        onDidDismiss={() => {
+          setShowAlert5(false);
+          setShowAlert3(true);
+        }}
+        header='Alert Message'
+        message={"Invalid filename!"}
+        buttons={["Ok"]}
+      />
+    </React.Fragment>
   );
 };
 

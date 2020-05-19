@@ -68,10 +68,10 @@ const App: React.FC = () => {
     AppGeneral.initializeApp(JSON.stringify(data));
   }, []);
 
-  useEffect(()=>{
-    activateFooter(billType)
-  },[billType]);
-  
+  useEffect(() => {
+    activateFooter(billType);
+  }, [billType]);
+
   const footers = DATA["home"][device]["footers"];
   const footersList = footers.map((footerArray) => {
     return (
@@ -97,21 +97,19 @@ const App: React.FC = () => {
         <IonHeader>
           <IonToolbar color='primary'>
             <Login />
-            
-              {
-                selectedFile === "default" ? 
-                <IonIcon
-                  icon={settings}
-                  slot='end'
-                  className='ion-padding-end'
-                  size='large'
-                  onClick={(e) => {
-                    setShowPopover({ open: true, event: e.nativeEvent });
-                    console.log("Popover clicked");
-                  }}
-                />: 
-                null
-              }
+
+            {selectedFile === "default" ? (
+              <IonIcon
+                icon={settings}
+                slot='end'
+                className='ion-padding-end'
+                size='large'
+                onClick={(e) => {
+                  setShowPopover({ open: true, event: e.nativeEvent });
+                  console.log("Popover clicked");
+                }}
+              />
+            ) : null}
             <Files
               store={store}
               file={selectedFile}
@@ -158,7 +156,7 @@ const App: React.FC = () => {
           file={selectedFile}
           updateSelectedFile={updateSelectedFile}
           store={store}
-          bT= {billType}
+          bT={billType}
         />
         <div id='workbookControl'></div>
         <div id='tableeditor'>editor goes here</div>
