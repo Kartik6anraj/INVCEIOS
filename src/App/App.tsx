@@ -50,6 +50,7 @@ const App: React.FC = () => {
     event: Event | undefined;
   }>({ open: false, event: undefined });
   const [selectedFile, updateSelectedFile] = useState("default");
+  const [billType, updateBillType] = useState(1);
   const [device] = useState(AppGeneral.getDeviceType());
 
   const store = new Local();
@@ -67,6 +68,10 @@ const App: React.FC = () => {
     AppGeneral.initializeApp(JSON.stringify(data));
   }, []);
 
+  useEffect(()=>{
+    activateFooter(billType)
+  },[billType]);
+  
   const footers = DATA["home"][device]["footers"];
   const footersList = footers.map((footerArray) => {
     return (
@@ -76,6 +81,7 @@ const App: React.FC = () => {
         color='light'
         className='ion-no-margin'
         onClick={() => {
+          updateBillType(footerArray.index);
           activateFooter(footerArray.index);
           setShowPopover({ open: false, event: undefined });
         }}
@@ -87,79 +93,37 @@ const App: React.FC = () => {
 
   return (
     <IonApp>
-      {/*
-      <IonHeader>
-        <IonToolbar color='primary'>
-          <Login />
-          <IonIcon
-            icon={settings}
-            slot='end'
-            className='ion-padding-end'
-            size='large'
-            onClick={(e) => {
-              setShowPopover({ open: true, event: e.nativeEvent });
-              console.log("Popover clicked");
-            }}
-          />
-
-          <Files
-            store={store}
-            file={selectedFile}
-            updateSelectedFile={updateSelectedFile}
-          />
-
-          <NewFile
-            file={selectedFile}
-            updateSelectedFile={updateSelectedFile}
-            store={store}
-          />
-
-          <IonPopover
-            animated
-            keyboardClose
-            backdropDismiss
-            event={showPopover.event}
-            isOpen={showPopover.open}
-            onDidDismiss={() =>
-              setShowPopover({ open: false, event: undefined })
-            }
-          >
-            {footersList}
-          </IonPopover>
-        </IonToolbar>
-      </IonHeader>
-      
-      <IonToolbar color='secondary'>
-        <IonTitle className='ion-text-center'>
-          Editing : {selectedFile}
-        </IonTitle>
-      </IonToolbar>
-      */}
       <IonContent>
         <IonHeader>
           <IonToolbar color='primary'>
             <Login />
-            <IonIcon
-              icon={settings}
-              slot='end'
-              className='ion-padding-end'
-              size='large'
-              onClick={(e) => {
-                setShowPopover({ open: true, event: e.nativeEvent });
-                console.log("Popover clicked");
-              }}
-            />
-
+            
+              {
+                selectedFile === "default" ? 
+                <IonIcon
+                  icon={settings}
+                  slot='end'
+                  className='ion-padding-end'
+                  size='large'
+                  onClick={(e) => {
+                    setShowPopover({ open: true, event: e.nativeEvent });
+                    console.log("Popover clicked");
+                  }}
+                />: 
+                null
+              }
             <Files
               store={store}
               file={selectedFile}
               updateSelectedFile={updateSelectedFile}
+              updateBillType={updateBillType}
             />
 
             <NewFile
               file={selectedFile}
               updateSelectedFile={updateSelectedFile}
               store={store}
+              billType={billType}
             />
 
             <IonPopover
@@ -194,6 +158,7 @@ const App: React.FC = () => {
           file={selectedFile}
           updateSelectedFile={updateSelectedFile}
           store={store}
+          bT= {billType}
         />
         <div id='workbookControl'></div>
         <div id='tableeditor'>editor goes here</div>

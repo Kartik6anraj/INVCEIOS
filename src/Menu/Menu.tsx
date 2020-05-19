@@ -20,6 +20,7 @@ const Menu: React.FC<{
   file: string;
   updateSelectedFile: Function;
   store: Local;
+  bT : number;
 }> = (props) => {
   /* Utility functions */
   const _validateName = (filename) => {
@@ -66,7 +67,8 @@ const Menu: React.FC<{
       data.created,
       new Date().toString(),
       content,
-      props.file
+      props.file,
+      props.bT
     );
     props.store._saveFile(file);
     props.updateSelectedFile(props.file);
@@ -85,7 +87,8 @@ const Menu: React.FC<{
           new Date().toString(),
           new Date().toString(),
           content,
-          filename
+          filename,
+          props.bT
         );
         // const data = { created: file.created, modified: file.modified, content: file.content, password: file.password };
         // console.log(JSON.stringify(data));

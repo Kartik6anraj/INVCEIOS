@@ -9,6 +9,7 @@ const NewFile: React.FC<{
   file: string;
   updateSelectedFile: Function;
   store: Local;
+  billType: number;
 }> = (props) => {
   const newFile = () => {
     if (props.file !== "default") {
@@ -18,7 +19,8 @@ const NewFile: React.FC<{
         data.created,
         new Date().toString(),
         content,
-        props.file
+        props.file,
+        props.billType
       );
       props.store._saveFile(file);
       props.updateSelectedFile(props.file);

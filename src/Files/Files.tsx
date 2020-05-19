@@ -17,6 +17,7 @@ const Files: React.FC<{
   store: Local;
   file: string;
   updateSelectedFile: Function;
+  updateBillType: Function;
 }> = (props) => {
   const [files, setFiles] = useState(props.store._getAllFiles());
   const [listFiles, setListFiles] = useState(false);
@@ -26,6 +27,7 @@ const Files: React.FC<{
     // console.log(JSON.stringify(data));
     AppGeneral.viewFile(key, decodeURIComponent(data.content));
     props.updateSelectedFile(key);
+    props.updateBillType(data.billType);
   };
 
   const deleteFile = (key) => {

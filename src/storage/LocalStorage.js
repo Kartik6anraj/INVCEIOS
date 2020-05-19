@@ -6,12 +6,14 @@ export class File {
   name;
   content;
   password;
+  billType;
 
-  constructor(created, modified, content, name, password) {
+  constructor(created, modified, content, name, billType, password) {
     this.created = created;
     this.modified = modified;
     this.content = content;
     this.name = name;
+    this.billType = billType;
     this.password = password;
   }
 }
@@ -28,6 +30,7 @@ export class Local {
       created: file.created,
       modified: file.modified,
       content: file.content,
+      billType: file.billType,
       password: file.password,
     };
     this.storage.setItem(file.name, JSON.stringify(data));
