@@ -29,7 +29,11 @@ const Login: React.FC = () => {
   const loginForm = () => {
     if (openLoginModal) {
       return (
-        <IonModal isOpen={openLoginModal} animated>
+        <IonModal
+          isOpen={openLoginModal}
+          animated
+          onDidDismiss={() => setOpenLoginModal(false)}
+        >
           <IonList>
             <IonItem>
               <IonInput
@@ -63,6 +67,15 @@ const Login: React.FC = () => {
               }}
             >
               Login
+            </IonButton>
+            <IonButton
+              expand='block'
+              color='secondary'
+              onClick={() => {
+                setOpenLoginModal(false);
+              }}
+            >
+              Back
             </IonButton>
           </IonList>
         </IonModal>

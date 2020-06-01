@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import * as AppGeneral from "../socialcalc/AppGeneral";
-import { DATA } from "../app-data.js";
-import { File, Local } from "../storage/LocalStorage.js";
+import { File, Local } from "../storage/LocalStorage";
 import AWS from "aws-sdk";
 
-import { IonActionSheet, IonAlert, IonicSafeString } from "@ionic/react";
+import { IonActionSheet, IonAlert } from "@ionic/react";
 import { saveOutline, save, mail, print } from "ionicons/icons";
 
 const ses = new AWS.SES({
@@ -74,7 +73,7 @@ const Menu: React.FC<{
     const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
     const data = props.store._getFile(props.file);
     const file = new File(
-      data.created,
+      (data as any).created,
       new Date().toString(),
       content,
       props.file,

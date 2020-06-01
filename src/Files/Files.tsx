@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Files.css";
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { DATA } from "../app-data.js";
-import { Local } from "../storage/LocalStorage.js";
+import { Local } from "../storage/LocalStorage";
 import {
   IonIcon,
   IonModal,
@@ -11,7 +11,7 @@ import {
   IonList,
   IonLabel,
 } from "@ionic/react";
-import { fileTrayFull, key } from "ionicons/icons";
+import { fileTrayFull, list } from "ionicons/icons";
 
 const Files: React.FC<{
   store: Local;
@@ -20,14 +20,16 @@ const Files: React.FC<{
   updateBillType: Function;
 }> = (props) => {
   const [files, setFiles] = useState(props.store._getAllFiles());
+  const [modal, setModal] = useState(null);
   const [listFiles, setListFiles] = useState(false);
 
   const editFile = (key) => {
-    const data = props.store._getFile(key);
+    props.store._getFile(key).then((data) => {
+      AppGeneral.viewFile(key, decodeURIComponent((data as any).content));
+      props.updateSelectedFile(key);
+      props.updateBillType((data as any).billType);
+    });
     // console.log(JSON.stringify(data));
-    AppGeneral.viewFile(key, decodeURIComponent(data.content));
-    props.updateSelectedFile(key);
-    props.updateBillType(data.billType);
   };
 
   const deleteFile = (key) => {
@@ -36,7 +38,7 @@ const Files: React.FC<{
     if (result) {
       // Delete file
       props.store._deleteFile(key);
-      setFiles(props.store._getAllFiles());
+      props.store._getAllFiles().then((data) => setFiles(data as any));
       loadDefault();
     }
   };
@@ -51,15 +53,13 @@ const Files: React.FC<{
     return new Date(date).toLocaleString();
   };
 
-  const listModal = () => {
-    const files = props.store._getAllFiles();
-    // console.log(JSON.stringify(files));
-    const fileList = Object.keys(files).map((key) => {
-      // console.log(key);
+  const temp = async () => {
+    const data = await props.store._getAllFiles();
+    const fileList = Object.keys(data).map((key) => {
       return (
         <IonItem key={key}>
           <IonLabel>{key}</IonLabel>
-          <span>{" " + _formatDate(files[key])}</span>
+          <span>{" " + _formatDate(data[key])}</span>
           <IonButton
             slot='end'
             color='warning'
@@ -83,14 +83,27 @@ const Files: React.FC<{
         </IonItem>
       );
     });
-    if (setListFiles) {
-      return (
-        <IonModal isOpen={listFiles} onDidDismiss={() => setListFiles(false)}>
-          <IonList> {fileList} </IonList>
-        </IonModal>
-      );
-    } else return null;
+
+    const ourModal = (
+      <IonModal isOpen={listFiles} onDidDismiss={() => setListFiles(false)}>
+        <IonList>{fileList}</IonList>
+        <IonButton
+          expand='block'
+          color='secondary'
+          onClick={() => {
+            setListFiles(false);
+          }}
+        >
+          Back
+        </IonButton>
+      </IonModal>
+    );
+    setModal(ourModal);
   };
+
+  useEffect(() => {
+    temp();
+  }, [listFiles]);
 
   return (
     <React.Fragment>
@@ -103,7 +116,7 @@ const Files: React.FC<{
           setListFiles(true);
         }}
       />
-      {listModal()}
+      {modal}
     </React.Fragment>
   );
 };
