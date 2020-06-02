@@ -10,6 +10,7 @@ import {
   IonButton,
   IonList,
   IonLabel,
+  IonAlert,
 } from "@ionic/react";
 import { fileTrayFull, list } from "ionicons/icons";
 
@@ -19,9 +20,10 @@ const Files: React.FC<{
   updateSelectedFile: Function;
   updateBillType: Function;
 }> = (props) => {
-  const [files, setFiles] = useState(props.store._getAllFiles());
   const [modal, setModal] = useState(null);
   const [listFiles, setListFiles] = useState(false);
+  const [showAlert1, setShowAlert1] = useState(false);
+  const [currentKey, setCurrentKey] = useState(null);
 
   const editFile = (key) => {
     props.store._getFile(key).then((data) => {
@@ -34,13 +36,8 @@ const Files: React.FC<{
 
   const deleteFile = (key) => {
     // event.preventDefault();
-    const result = window.confirm(`Do you want to delete the ${key} file?`);
-    if (result) {
-      // Delete file
-      props.store._deleteFile(key);
-      props.store._getAllFiles().then((data) => setFiles(data as any));
-      loadDefault();
-    }
+    setShowAlert1(true);
+    setCurrentKey(key);
   };
 
   const loadDefault = () => {
@@ -117,6 +114,24 @@ const Files: React.FC<{
         }}
       />
       {modal}
+      <IonAlert
+        animated
+        isOpen={showAlert1}
+        onDidDismiss={() => setShowAlert1(false)}
+        header='Delete file'
+        message={"Do you want to delete the " + currentKey + " file?"}
+        buttons={[
+          { text: "No", role: "cancel" },
+          {
+            text: "Yes",
+            handler: () => {
+              props.store._deleteFile(currentKey);
+              loadDefault();
+              setCurrentKey(null);
+            },
+          },
+        ]}
+      />
     </React.Fragment>
   );
 };

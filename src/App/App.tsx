@@ -10,6 +10,7 @@ import {
   IonFab,
   IonFabButton,
   IonPopover,
+  IonPage,
 } from "@ionic/react";
 import { settings, menu } from "ionicons/icons";
 
@@ -93,75 +94,76 @@ const App: React.FC = () => {
 
   return (
     <IonApp>
-      <IonContent>
-        <IonHeader>
-          <IonToolbar color='primary'>
-            <Login />
+      <IonPage>
+        <IonContent>
+          <IonHeader>
+            <IonToolbar color='primary'>
+              <Login />
 
-            {selectedFile === "default" ? (
-              <IonIcon
-                icon={settings}
-                slot='end'
-                className='ion-padding-end'
-                size='large'
-                onClick={(e) => {
-                  setShowPopover({ open: true, event: e.nativeEvent });
-                  console.log("Popover clicked");
-                }}
+              {selectedFile === "default" ? (
+                <IonIcon
+                  icon={settings}
+                  slot='end'
+                  className='ion-padding-end'
+                  size='large'
+                  onClick={(e) => {
+                    setShowPopover({ open: true, event: e.nativeEvent });
+                    console.log("Popover clicked");
+                  }}
+                />
+              ) : null}
+              <Files
+                store={store}
+                file={selectedFile}
+                updateSelectedFile={updateSelectedFile}
+                updateBillType={updateBillType}
               />
-            ) : null}
-            <Files
-              store={store}
-              file={selectedFile}
-              updateSelectedFile={updateSelectedFile}
-              updateBillType={updateBillType}
-            />
 
-            <NewFile
-              file={selectedFile}
-              updateSelectedFile={updateSelectedFile}
-              store={store}
-              billType={billType}
-            />
+              <NewFile
+                file={selectedFile}
+                updateSelectedFile={updateSelectedFile}
+                store={store}
+                billType={billType}
+              />
 
-            <IonPopover
-              animated
-              keyboardClose
-              backdropDismiss
-              event={showPopover.event}
-              isOpen={showPopover.open}
-              onDidDismiss={() =>
-                setShowPopover({ open: false, event: undefined })
-              }
-            >
-              {footersList}
-            </IonPopover>
+              <IonPopover
+                animated
+                keyboardClose
+                backdropDismiss
+                event={showPopover.event}
+                isOpen={showPopover.open}
+                onDidDismiss={() =>
+                  setShowPopover({ open: false, event: undefined })
+                }
+              >
+                {footersList}
+              </IonPopover>
+            </IonToolbar>
+          </IonHeader>
+          <IonToolbar color='secondary'>
+            <IonTitle className='ion-text-center'>
+              Editing : {selectedFile}
+            </IonTitle>
           </IonToolbar>
-        </IonHeader>
 
-        <IonToolbar color='secondary'>
-          <IonTitle className='ion-text-center'>
-            Editing : {selectedFile}
-          </IonTitle>
-        </IonToolbar>
-
-        <IonFab vertical='bottom' horizontal='end' slot='fixed'>
-          <IonFabButton type='button' onClick={() => setShowMenu(true)}>
-            <IonIcon icon={menu} />
-          </IonFabButton>
-        </IonFab>
-        <Menu
-          showM={showMenu}
-          setM={closeMenu}
-          file={selectedFile}
-          updateSelectedFile={updateSelectedFile}
-          store={store}
-          bT={billType}
-        />
-        <div id='workbookControl'></div>
-        <div id='tableeditor'>editor goes here</div>
-        <div id='msg'></div>
-      </IonContent>
+          <IonFab vertical='bottom' horizontal='end' slot='fixed'>
+            <IonFabButton type='button' onClick={() => setShowMenu(true)}>
+              <IonIcon icon={menu} />
+            </IonFabButton>
+          </IonFab>
+          <Menu
+            showM={showMenu}
+            setM={closeMenu}
+            file={selectedFile}
+            updateSelectedFile={updateSelectedFile}
+            store={store}
+            bT={billType}
+          />
+          <div id='workbookControl'></div>
+          <div id='tableeditor'>editor goes here</div>
+          <div id='msg'></div>
+        </IonContent>
+      </IonPage>
     </IonApp>
   );
 };
