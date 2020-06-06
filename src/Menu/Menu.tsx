@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { File, Local } from "../storage/LocalStorage";
 import AWS from "aws-sdk";
-
+import { EmailComposer } from "@ionic-native/email-composer";
 import { IonActionSheet, IonAlert } from "@ionic/react";
 import { saveOutline, save, mail, print } from "ionicons/icons";
 
@@ -110,29 +110,44 @@ const Menu: React.FC<{
   };
 
   const sendEmail = () => {
-    // Prepare values to send with email
-    const emailParams = {
-      Destination: { ToAddresses: ["<aspiringuserapps@gmail.com>"] },
-      Message: {
-        Body: {
-          Text: {
-            Data: "This is a test email",
-          },
-        },
-        Subject: { Data: "Contact Form" },
-      },
-      ReplyToAddresses: [""],
-      Source: "<aspiring.investments@gmail.com>", // this has to be verified email in SES
-    };
-
-    ses.sendEmail(emailParams, function (error, data) {
-      if (error) {
-        // handle error
-      } else {
-        // handle success
-        alert("Done");
-      }
+    const emailComposer = EmailComposer;
+    // emailComposer.addAlias("gmail", "com.google.android.gm");
+    // then use alias when sending email
+    emailComposer.open({
+      app: "mailto",
+      to: "geetanshu2502@gmail.com",
+      cc: "erika@mustermann.de",
+      bcc: ["john@doe.com", "jane@doe.com"],
+      attachments: [],
+      subject: "Test mail",
+      body: AppGeneral.getCurrentHTMLContent(),
+      isHtml: true,
     });
+    // console.log(AppGeneral.getCurrentHTMLContent());
+
+    // // Prepare values to send with email
+    // const emailParams = {
+    //   Destination: { ToAddresses: ["<aspiringuserapps@gmail.com>"] },
+    //   Message: {
+    //     Body: {
+    //       Text: {
+    //         Data: "This is a test email",
+    //       },
+    //     },
+    //     Subject: { Data: "Contact Form" },
+    //   },
+    //   ReplyToAddresses: [""],
+    //   Source: "<aspiring.investments@gmail.com>", // this has to be verified email in SES
+    // };
+
+    // ses.sendEmail(emailParams, function (error, data) {
+    //   if (error) {
+    //     // handle error
+    //   } else {
+    //     // handle success
+    //     alert("Done");
+    //   }
+    // });
   };
 
   return (
