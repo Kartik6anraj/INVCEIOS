@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { File, Local } from "../storage/LocalStorage";
 import AWS from "aws-sdk";
+import { isPlatform } from "@ionic/react";
 import { EmailComposer } from "@ionic-native/email-composer";
+import { Printer, PrintOptions } from "@ionic-native/printer";
 import { IonActionSheet, IonAlert } from "@ionic/react";
 import { saveOutline, save, mail, print } from "ionicons/icons";
 
@@ -59,10 +61,15 @@ const Menu: React.FC<{
   };
 
   const doPrint = () => {
-    const content = AppGeneral.getCurrentHTMLContent();
-    var printWindow = window.open("", "", "left=100,top=100");
-    printWindow.document.write(content);
-    printWindow.print();
+    if (isPlatform("hybrid")) {
+      const printer = Printer;
+      printer.print(AppGeneral.getCurrentHTMLContent());
+    } else {
+      const content = AppGeneral.getCurrentHTMLContent();
+      var printWindow = window.open("", "", "left=100,top=100");
+      printWindow.document.write(content);
+      printWindow.print();
+    }
   };
 
   const doSave = () => {
@@ -119,7 +126,7 @@ const Menu: React.FC<{
       cc: "erika@mustermann.de",
       bcc: ["john@doe.com", "jane@doe.com"],
       attachments: [],
-      subject: "Test mail",
+      subject: "Test mail v;lvjposvjm;2",
       body: AppGeneral.getCurrentHTMLContent(),
       isHtml: true,
     });
