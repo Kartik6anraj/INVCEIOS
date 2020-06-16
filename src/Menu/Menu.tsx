@@ -4,7 +4,7 @@ import { File, Local } from "../storage/LocalStorage";
 import AWS from "aws-sdk";
 import { isPlatform } from "@ionic/react";
 import { EmailComposer } from "@ionic-native/email-composer";
-import { Printer, PrintOptions } from "@ionic-native/printer";
+import { Printer } from "@ionic-native/printer";
 import { IonActionSheet, IonAlert } from "@ionic/react";
 import { saveOutline, save, mail, print } from "ionicons/icons";
 
@@ -117,22 +117,43 @@ const Menu: React.FC<{
   };
 
   const sendEmail = () => {
-    const emailComposer = EmailComposer;
-    // emailComposer.addAlias("gmail", "com.google.android.gm");
-    // then use alias when sending email
-    emailComposer.open({
-      app: "mailto",
-      to: "geetanshu2502@gmail.com",
-      cc: "erika@mustermann.de",
-      bcc: ["john@doe.com", "jane@doe.com"],
-      attachments: [],
-      subject: "Test mail v;lvjposvjm;2",
-      body: AppGeneral.getCurrentHTMLContent(),
-      isHtml: true,
-    });
-    // console.log(AppGeneral.getCurrentHTMLContent());
+    if (isPlatform("hybrid")) {
+      const emailComposer = EmailComposer;
+      emailComposer.addAlias("gmail", "com.google.android.gm");
+      // then use alias when sending email
+      emailComposer.open({
+        app: "mailto",
+        to: "geetanshu2502@gmail.com",
+        cc: "erika@mustermann.de",
+        bcc: ["john@doe.com", "jane@doe.com"],
+        attachments: [],
+        subject: "Test mail",
+        body: AppGeneral.getCurrentHTMLContent(),
+        isHtml: true,
+      });
+      console.log(AppGeneral.getCurrentHTMLContent());
+    } else {
+      const mailgun = require("mailgun-js");
+      const mg = mailgun({
+        apiKey: "key-a128dfbe216c92500974c6d8ee1d4caa",
+        domain: "sandbox9e26c52330b343b3bb63ff465a74f156.mailgun.org",
+      });
+      const data = {
+        from: "Excited User <me@samples.mailgun.org>",
+        to: "geetanshu2502@gmail.com",
+        subject: "Test Mail",
+        html: AppGeneral.getCurrentHTMLContent(),
+      };
+      mg.messages().send(data, function (error, body) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email sent successfully");
+        }
+      });
+    }
 
-    // // Prepare values to send with email
+    // Prepare values to send with email
     // const emailParams = {
     //   Destination: { ToAddresses: ["<aspiringuserapps@gmail.com>"] },
     //   Message: {
@@ -150,6 +171,7 @@ const Menu: React.FC<{
     // ses.sendEmail(emailParams, function (error, data) {
     //   if (error) {
     //     // handle error
+    //     console.log(error);
     //   } else {
     //     // handle success
     //     alert("Done");

@@ -24,6 +24,7 @@
     "cordova-plugin-printer": "^0.8.0",
     "ionicons": "^5.0.0",
     "jetifier": "^1.6.5",
+    "mailgun-js": "^0.22.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-router": "^5.1.2",
