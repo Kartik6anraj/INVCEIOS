@@ -58,4 +58,10 @@ export class Local {
   _deleteFile = async (name: string) => {
     await Storage.remove({ key: name });
   };
+
+  _checkKey = async (key) => {
+    const { keys } = await Storage.keys();
+    if (keys.includes(key, 0)) return true;
+    else return false;
+  };
 }

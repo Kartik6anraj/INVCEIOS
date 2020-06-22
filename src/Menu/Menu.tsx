@@ -1,19 +1,11 @@
 import React, { useState } from "react";
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { File, Local } from "../storage/LocalStorage";
-import AWS from "aws-sdk";
-import { isPlatform } from "@ionic/react";
+import { isPlatform, IonToast } from "@ionic/react";
 import { EmailComposer } from "@ionic-native/email-composer";
 import { Printer } from "@ionic-native/printer";
 import { IonActionSheet, IonAlert } from "@ionic/react";
 import { saveOutline, save, mail, print } from "ionicons/icons";
-
-const ses = new AWS.SES({
-  apiVersion: "2010-12-01",
-  accessKeyId: "AKIAIUAT6PWCBX54OQEA",
-  secretAccessKey: "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",
-  region: "us-west-1",
-});
 
 const Menu: React.FC<{
   showM: boolean;
@@ -27,22 +19,25 @@ const Menu: React.FC<{
   const [showAlert2, setShowAlert2] = useState(false);
   const [showAlert3, setShowAlert3] = useState(false);
   const [showAlert4, setShowAlert4] = useState(false);
-  const [showAlert5, setShowAlert5] = useState(false);
-
+  const [showToast1, setShowToast1] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
   /* Utility functions */
   const _validateName = (filename) => {
     filename = filename.trim();
     if (filename === "default" || filename === "Untitled") {
-      // return 'Cannot update default file!';
+      setToastMessage("Cannot update default file!");
       return false;
     } else if (filename === "" || !filename) {
-      // this.showToast('Filename cannot be empty');
+      setToastMessage("Filename cannot be empty");
       return false;
     } else if (filename.length > 30) {
-      // this.showToast('Filename too long');
+      setToastMessage("Filename too long");
       return false;
     } else if (/^[a-zA-Z0-9- ]*$/.test(filename) === false) {
-      // this.showToast('Special Characters cannot be used');
+      setToastMessage("Special Characters cannot be used");
+      return false;
+    } else if (props.store._checkKey(filename)) {
+      setToastMessage("Filename already exists");
       return false;
     }
     return true;
@@ -94,6 +89,7 @@ const Menu: React.FC<{
   const doSaveAs = (filename) => {
     // event.preventDefault();
     if (filename) {
+      console.log(filename, _validateName(filename));
       if (_validateName(filename)) {
         // filename valid . go on save
         const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
@@ -111,7 +107,7 @@ const Menu: React.FC<{
         props.updateSelectedFile(filename);
         setShowAlert4(true);
       } else {
-        setShowAlert5(true);
+        setShowToast1(true);
       }
     }
   };
@@ -120,6 +116,7 @@ const Menu: React.FC<{
     if (isPlatform("hybrid")) {
       const emailComposer = EmailComposer;
       emailComposer.addAlias("gmail", "com.google.android.gm");
+      const content = AppGeneral.getCurrentHTMLContent();
       // then use alias when sending email
       emailComposer.open({
         app: "mailto",
@@ -128,7 +125,7 @@ const Menu: React.FC<{
         bcc: ["john@doe.com", "jane@doe.com"],
         attachments: [],
         subject: "Test mail",
-        body: AppGeneral.getCurrentHTMLContent(),
+        body: content,
         isHtml: true,
       });
       console.log(AppGeneral.getCurrentHTMLContent());
@@ -152,31 +149,6 @@ const Menu: React.FC<{
         }
       });
     }
-
-    // Prepare values to send with email
-    // const emailParams = {
-    //   Destination: { ToAddresses: ["<aspiringuserapps@gmail.com>"] },
-    //   Message: {
-    //     Body: {
-    //       Text: {
-    //         Data: "This is a test email",
-    //       },
-    //     },
-    //     Subject: { Data: "Contact Form" },
-    //   },
-    //   ReplyToAddresses: [""],
-    //   Source: "<aspiring.investments@gmail.com>", // this has to be verified email in SES
-    // };
-
-    // ses.sendEmail(emailParams, function (error, data) {
-    //   if (error) {
-    //     // handle error
-    //     console.log(error);
-    //   } else {
-    //     // handle success
-    //     alert("Done");
-    //   }
-    // });
   };
 
   return (
@@ -272,16 +244,16 @@ const Menu: React.FC<{
         }
         buttons={["Ok"]}
       />
-      <IonAlert
+      <IonToast
         animated
-        isOpen={showAlert5}
+        isOpen={showToast1}
         onDidDismiss={() => {
-          setShowAlert5(false);
+          setShowToast1(false);
           setShowAlert3(true);
         }}
-        header='Alert Message'
-        message={"Invalid filename!"}
-        buttons={["Ok"]}
+        position='bottom'
+        message={toastMessage}
+        duration={500}
       />
     </React.Fragment>
   );

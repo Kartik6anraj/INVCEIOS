@@ -11,6 +11,10 @@ import {
   IonList,
   IonLabel,
   IonAlert,
+  IonItemGroup,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption,
 } from "@ionic/react";
 import { fileTrayFull, list } from "ionicons/icons";
 
@@ -54,30 +58,61 @@ const Files: React.FC<{
     const data = await props.store._getAllFiles();
     const fileList = Object.keys(data).map((key) => {
       return (
-        <IonItem key={key}>
-          <IonLabel>{key}</IonLabel>
-          <span>{" " + _formatDate(data[key])}</span>
-          <IonButton
-            slot='end'
-            color='warning'
-            onClick={() => {
-              setListFiles(false);
-              editFile(key);
-            }}
-          >
-            Edit
-          </IonButton>
-          <IonButton
-            slot='end'
-            color='danger'
-            onClick={() => {
-              setListFiles(false);
-              deleteFile(key);
-            }}
-          >
-            Delete
-          </IonButton>
-        </IonItem>
+        <IonItemGroup key={key}>
+          <IonItemSliding>
+            <IonItemOptions side='start'>
+              <IonItemOption
+                color='warning'
+                onClick={() => {
+                  setListFiles(false);
+                  editFile(key);
+                }}
+              >
+                Edit
+              </IonItemOption>
+            </IonItemOptions>
+            <IonItem>
+              <IonLabel>{key}</IonLabel>
+              <span>{_formatDate(data[key])}</span>
+            </IonItem>
+            <IonItemOptions side='end'>
+              <IonItemOption
+                color='danger'
+                onClick={() => {
+                  setListFiles(false);
+                  deleteFile(key);
+                }}
+              >
+                Delete
+              </IonItemOption>
+            </IonItemOptions>
+          </IonItemSliding>
+
+          {/* <IonItem lines='none'>
+            <IonLabel>{key}</IonLabel>
+            <IonButton
+              slot='end'
+              color='warning'
+              onClick={() => {
+                setListFiles(false);
+                editFile(key);
+              }}
+            >
+              Edit
+            </IonButton>
+            <IonButton
+              slot='end'
+              color='danger'
+              onClick={() => {
+                setListFiles(false);
+                deleteFile(key);
+              }}
+            >
+              Delete
+            </IonButton>
+          </IonItem> */}
+          {/* <IonItem slot='start'>{_formatDate(data[key])}</IonItem> */}
+        </IonItemGroup>
       );
     });
 
