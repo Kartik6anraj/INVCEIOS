@@ -22,7 +22,7 @@ const Menu: React.FC<{
   const [showToast1, setShowToast1] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   /* Utility functions */
-  const _validateName = (filename) => {
+  const _validateName = async (filename) => {
     filename = filename.trim();
     if (filename === "default" || filename === "Untitled") {
       setToastMessage("Cannot update default file!");
@@ -36,7 +36,7 @@ const Menu: React.FC<{
     } else if (/^[a-zA-Z0-9- ]*$/.test(filename) === false) {
       setToastMessage("Special Characters cannot be used");
       return false;
-    } else if (props.store._checkKey(filename)) {
+    } else if (await props.store._checkKey(filename)) {
       setToastMessage("Filename already exists");
       return false;
     }
@@ -86,11 +86,11 @@ const Menu: React.FC<{
     setShowAlert2(true);
   };
 
-  const doSaveAs = (filename) => {
+  const doSaveAs = async (filename) => {
     // event.preventDefault();
     if (filename) {
-      console.log(filename, _validateName(filename));
-      if (_validateName(filename)) {
+      // console.log(filename, _validateName(filename));
+      if (await _validateName(filename)) {
         // filename valid . go on save
         const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
         // console.log(content);
