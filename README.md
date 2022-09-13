@@ -1,3 +1,5 @@
+Ionic React Modules development by Geetanshu and Manu
+
 1. npm i -g @ionic/cli
 2. git clone https://github.com/geetanshu2502/ionicReactApp
 3. cd ionicReactApp
