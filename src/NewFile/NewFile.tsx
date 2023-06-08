@@ -1,8 +1,8 @@
-import React from "react";
+import React, {useState} from "react";
 import * as AppGeneral from "../socialcalc/AppGeneral";
 import { File, Local } from "../storage/LocalStorage";
 import { DATA } from "../app-data.js";
-import { IonIcon } from "@ionic/react";
+import { IonAlert, IonIcon } from "@ionic/react";
 import { add } from "ionicons/icons";
 
 const NewFile: React.FC<{
@@ -11,6 +11,7 @@ const NewFile: React.FC<{
   store: Local;
   billType: number;
 }> = (props) => {
+  const [showAlertNewFileCreated, setShowAlertNewFileCreated] = useState(false);
   const newFile = () => {
     if (props.file !== "default") {
       const content = encodeURIComponent(AppGeneral.getSpreadsheetContent());
@@ -28,19 +29,33 @@ const NewFile: React.FC<{
     const msc = DATA["home"][AppGeneral.getDeviceType()]["msc"];
     AppGeneral.viewFile("default", JSON.stringify(msc));
     props.updateSelectedFile("default");
+    setShowAlertNewFileCreated(true);
   };
 
   return (
-    <IonIcon
-      icon={add}
-      slot='end'
-      className='ion-padding-end'
-      size='large'
-      onClick={() => {
-        newFile();
-        console.log("New file clicked");
-      }}
-    />
+    <React.Fragment>
+      <IonIcon
+        icon={add}
+        slot='end'
+        className='ion-padding-end'
+        size='large'
+        onClick={() => {
+          newFile();
+          // console.log("New file clicked");
+        }}
+      />
+      <IonAlert
+        animated
+        isOpen={showAlertNewFileCreated}
+        onDidDismiss={() => setShowAlertNewFileCreated(false)}
+        header='Alert Message'
+        message={
+          "New file created!"
+        }
+        buttons={["Ok"]}
+      />
+    </React.Fragment>
+    
   );
 };
 

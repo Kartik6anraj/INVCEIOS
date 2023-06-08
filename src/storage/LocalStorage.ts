@@ -61,7 +61,10 @@ export class Local {
 
   _checkKey = async (key) => {
     const { keys } = await Storage.keys();
-    if (keys.includes(key, 0)) return true;
-    else return false;
+    if (keys.includes(key, 0)) {
+      return true;
+    } else {
+      return false;
+    } 
   };
 }
